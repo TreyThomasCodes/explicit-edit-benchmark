@@ -256,8 +256,18 @@ function canonicalIdentity({
     configurationLabels: [`harness/${harness}`],
     configurationId: `${harness}/default`,
     configuration: {
-      tools: harness === "pi-agent-ide" ? ["pi-agent-ide"] : ["default"],
-      extensions: harness === "pi-agent-ide" ? [`pi-agent-ide@${harnessVersion}`] : [],
+      tools:
+        harness === "baseline-agent"
+          ? ["bash"]
+          : harness === "pi-agent-ide"
+            ? ["pi-agent-ide"]
+            : ["default"],
+      extensions:
+        harness === "baseline-agent"
+          ? ["pi-baseline-agent@1"]
+          : harness === "pi-agent-ide"
+            ? [`pi-agent-ide@${harnessVersion}`]
+            : [],
       rules: [],
       runtimeFlags: [`thinking=${thinking}`],
       environment: provider?.apiKeyEnv ? [provider.apiKeyEnv] : [],
@@ -294,6 +304,7 @@ export function makeAdapter({
   const auth = (destination) => (authFile ? { [destination]: path.resolve(authFile) } : {});
   switch (harness) {
     case "pi-default":
+    case "baseline-agent":
     case "pi-agent-ide": {
       if (harness === "pi-agent-ide" && !idePackage)
         throw Error("IDE requires --ide-package for the installed package");
@@ -311,6 +322,9 @@ export function makeAdapter({
           "--no-prompt-templates",
           "--no-themes",
           "--no-context-files",
+          ...(harness === "baseline-agent"
+            ? ["--tools", "bash", "--extension", "/state/runner/pi-baseline-agent.mjs"]
+            : []),
           "--session-dir",
           "/state/pi/sessions",
           "--mode",
@@ -327,6 +341,13 @@ export function makeAdapter({
         },
         seedFiles: {
           ...auth("pi/auth.json"),
+          ...(harness === "baseline-agent"
+            ? {
+                "runner/pi-baseline-agent.mjs": fileURLToPath(
+                  new URL("./pi-baseline-agent.mjs", import.meta.url),
+                ),
+              }
+            : {}),
           ...(modelFile ? { "pi/models.json": path.resolve(modelFile) } : {}),
         },
       };

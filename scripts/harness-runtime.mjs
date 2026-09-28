@@ -41,6 +41,7 @@ export function recoveryAdapter(adapter, continuation) {
         "oh-my-pi-default",
         "github-copilot-cli-default",
         "pi-default",
+        "baseline-agent",
         "pi-agent-ide",
       ].includes(adapter.kind)
     )
@@ -347,7 +348,7 @@ export async function inspectHarnessOutput(kind, file) {
     calls = events.filter((e) => e.type === "tool_use");
     rounds = events.filter((e) => e.type === "step_finish").length;
     errors.push(...events.filter((e) => e.type === "error"));
-  } else if (["oh-my-pi-default", "pi-default", "pi-agent-ide"].includes(kind)) {
+  } else if (["oh-my-pi-default", "pi-default", "baseline-agent", "pi-agent-ide"].includes(kind)) {
     calls = events.filter((e) => e.type === "tool_execution_start");
     rounds = events.filter(
       (e) => e.type === "message_end" && e.message?.role === "assistant",
@@ -370,7 +371,7 @@ export async function inspectHarnessOutput(kind, file) {
   let costUsd = null;
   let failedToolCalls = null;
   let invalidToolCalls = null;
-  if (["oh-my-pi-default", "pi-default", "pi-agent-ide"].includes(kind)) {
+  if (["oh-my-pi-default", "pi-default", "baseline-agent", "pi-agent-ide"].includes(kind)) {
     const assistantEnds = events.filter(
       (event) => event.type === "message_end" && event.message?.role === "assistant",
     );

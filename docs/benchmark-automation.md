@@ -148,13 +148,13 @@ npm run benchmark -- dataset --output public-dataset \
   accepted/run-a/normalized accepted/run-b/normalized
 ```
 
-Every row gains a `runId`. `dataset-index.json` records the source manifest hashes, contracts, task-set hashes, completeness, counts, and the hash of every compressed shard. Building the dataset neither uploads it nor reads a Hugging Face token. An acceptance build also writes `leaderboard.json` and `views.json` from the same aggregation module. The second file holds the precomputed group, task-family, tool-usage, and drill-down views.
+Every row gains a `runId`. `dataset-index.json` records the source manifest hashes, contracts, task-set hashes, completeness, counts, and the hash of every compressed shard. Building the dataset neither uploads it nor reads a Hugging Face token. An acceptance build also writes `leaderboard.json`, `views.json`, and `data/explorer-summary.json.gz` from the same aggregation module. `views.json` holds the precomputed group, task-family, tool-usage, and drill-down views. The Explorer summary contains only the public UI fields needed for ordinary interaction, so its deployment reads one checked file instead of downloading every historical shard. Acceptance also writes one content-addressed detail package per run. The browser fetches and verifies that package only when the run is opened.
 
 Useful Hugging Face references: [Datasets](https://huggingface.co/docs/hub/datasets-overview), [Data Studio](https://huggingface.co/docs/hub/data-studio), and [storage limits](https://huggingface.co/docs/hub/storage-limits).
 
 ## Hugging Face contribution flow
 
-The Hugging Face dataset `main` branch is the only durable home for accepted observations. It stores accepted bundles under `source/`. The compressed tables, dataset card, `leaderboard.json`, `views.json`, `summary.json`, and `dataset-index.json` are generated views. Acceptance calculates Score and every ranking view before publication.
+The Hugging Face dataset `main` branch is the only durable home for accepted observations. It stores accepted bundles under `source/`. The compressed tables, dataset card, `leaderboard.json`, `views.json`, `data/explorer-summary.json.gz`, `summary.json`, and `dataset-index.json` are generated views. Acceptance calculates Score and every ranking view before publication.
 
 Contributors log in with their own Hugging Face token and open a dataset pull request:
 
@@ -194,3 +194,5 @@ Acceptance downloads current `main` and the candidate revision separately. It co
 Publication is one Hub commit whose `parentCommit` is the main commit it downloaded. If main moved during the build, Hugging Face rejects the commit. The command never retries against a new parent behind your back, so run it again and it will rebuild from the new main. The same operation rebuilds all accepted views and records their hashes in `dataset-index.json`. Those views are the ones this commit publishes; nothing downstream defines a Score of its own.
 
 The workflow uses the repository `HF_TOKEN` secret. Contributors never get that token.
+
+After a real Dataset change, acceptance sends a `dataset-updated` repository dispatch to `alexshpunt/benchmark-explorer`. Configure `EXPLORER_DISPATCH_TOKEN` as a repository secret with permission to dispatch events to that repository. Prefer a short-lived GitHub App token with only the required repository access. Dry runs and duplicate candidates do not send an event. If the secret is absent, publication still succeeds and the workflow records a warning so the Explorer's scheduled revision check can recover.

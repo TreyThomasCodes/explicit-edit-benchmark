@@ -93,6 +93,7 @@ await test("native adapters carry explicit model and reasoning through recovery"
   );
   for (const harness of [
     "pi-default",
+    "baseline-agent",
     "pi-agent-ide",
     "codex-cli-default",
     "opencode-default",
@@ -110,7 +111,13 @@ await test("native adapters carry explicit model and reasoning through recovery"
     assert.ok(JSON.stringify(adapter.args).includes("medium"));
     assert.equal(adapter.ready, false);
     assert.equal(adapter.env.SHELL, harness === "pi-agent-ide" ? "/bin/bash" : undefined);
-    assert.deepEqual(adapter.seedFiles, {});
+    if (harness === "baseline-agent") {
+      assert.deepEqual(
+        adapter.args.slice(adapter.args.indexOf("--tools"), adapter.args.indexOf("--tools") + 4),
+        ["--tools", "bash", "--extension", "/state/runner/pi-baseline-agent.mjs"],
+      );
+      assert.ok(adapter.seedFiles["runner/pi-baseline-agent.mjs"]);
+    } else assert.deepEqual(adapter.seedFiles, {});
     assert.ok(
       JSON.stringify(recoveryAdapter(adapter, true).args).includes("provider/model-example"),
     );
@@ -367,6 +374,17 @@ await test("a package is mounted with the dependencies installed beside it", () 
   assert.equal(dependencyRoot("/opt/standalone-package"), "/opt/standalone-package");
 });
 
+await test("baseline extension forces an empty system prompt", async () => {
+  const { default: baseline } = await import("../../scripts/pi-baseline-agent.mjs");
+  let handler;
+  baseline({
+    on(event, callback) {
+      assert.equal(event, "before_agent_start");
+      handler = callback;
+    },
+  });
+  assert.deepEqual(handler(), { systemPrompt: "" });
+});
 await test("every seeded file an adapter needs exists in the repository", async () => {
   // A missing seed file only shows up when a run starts, so check the paths here instead.
   const { existsSync } = await import("node:fs");

@@ -59,6 +59,7 @@ The benchmark has ready adapters for these CLIs. Use the name in the `--harness`
 | `--harness`                  | Runs                                                                                                                | Binary     |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------- |
 | `pi-default`                 | [Pi](https://pi.dev/)                                                                                               | `pi`       |
+| `baseline-agent`             | Pi with bash only and an empty system prompt                                                                        | `pi`       |
 | `pi-agent-ide`               | [Pi Agent IDE](https://github.com/alexshpunt/pi-agent-ide)                                                          | `pi`       |
 | `codex-cli-default`          | [Codex CLI](https://github.com/openai/codex)                                                                        | `codex`    |
 | `opencode-default`           | [OpenCode](https://github.com/anomalyco/opencode)                                                                   | `opencode` |

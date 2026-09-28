@@ -14,11 +14,12 @@ npm run benchmark:submit -- --harness codex-cli-default --model PROVIDER/MODEL -
 
 The command writes a temporary configuration into the system temp folder and deletes it when it finishes, so you never prepare or commit a config file for a ready adapter.
 
-`--harness` takes the published harness family: `pi-default`, `pi-agent-ide`, `codex-cli-default`, `opencode-default`, `oh-my-pi-default`, `github-copilot-cli-default`, `dsh-standard`, or `dsh-code`.
+`--harness` takes the published harness family: `pi-default`, `baseline-agent`, `pi-agent-ide`, `codex-cli-default`, `opencode-default`, `oh-my-pi-default`, `github-copilot-cli-default`, `dsh-standard`, or `dsh-code`.
 
 | Adapter                      | Binary     |
 | ---------------------------- | ---------- |
 | `pi-default`                 | `pi`       |
+| `baseline-agent`             | `pi`       |
 | `pi-agent-ide`               | `pi`       |
 | `codex-cli-default`          | `codex`    |
 | `opencode-default`           | `opencode` |
@@ -31,11 +32,14 @@ The adapter name is the published family, so the accepted result is grouped unde
 
 Install your agent yourself and log in the way that agent expects. The benchmark never installs or updates an agent, and it never borrows someone else's credentials.
 
+`baseline-agent` runs Pi with only the built-in `bash` tool. It disables discovered extensions, skills, templates, themes and context files; its one explicitly loaded extension replaces the system prompt with an empty string. Use the same Pi authentication as `pi-default`.
+
 ## Models and reasoning
 
 | Adapter                      | `--model` argument   | Authentication                       |
 | ---------------------------- | -------------------- | ------------------------------------ |
 | `pi-default`                 | Pi provider/model id | Pi `auth.json` via `--auth-file`     |
+| `baseline-agent`             | Pi provider/model id | Pi `auth.json` via `--auth-file`     |
 | `pi-agent-ide`               | Pi provider/model id | Pi `auth.json` via `--auth-file`     |
 | `codex-cli-default`          | Provider model id    | Responses provider key               |
 | `opencode-default`           | Provider model id    | OpenAI-compatible provider key       |

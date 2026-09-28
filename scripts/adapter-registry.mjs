@@ -10,6 +10,13 @@ export const ADAPTERS = Object.freeze({
     credential: "pi",
     repositoryUrl: "https://github.com/earendil-works/pi",
   },
+  "baseline-agent": {
+    agentFamily: "pi",
+    binary: "pi",
+    package: "@earendil-works/pi-coding-agent",
+    credential: "pi",
+    repositoryUrl: "https://github.com/earendil-works/pi",
+  },
   "pi-agent-ide": {
     agentFamily: "pi",
     binary: "pi",
